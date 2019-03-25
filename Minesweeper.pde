@@ -44,28 +44,54 @@ public void draw ()
   background( 0 );
   if (isWon())
     displayWinningMessage();
-  else
-    displayLosingMessage();
 }
 
 public boolean isWon()
 {
-  //your code here
-   
-  return false;
+  for (int r = 0; r < NUM_ROWS; r++)
+  {
+    for (int c = 0; c < NUM_COLS; c++)
+    {
+      if (!buttons[r][c].isClicked() == true && !bombs.contains(buttons[r][c]))
+      {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 public void displayLosingMessage()
 {
   //your code here
-  //public String loss = new String ("You Lost!");
-  
+  for (int r = 0; r < NUM_ROWS; r++)
+  {
+    for (int c = 0; c < NUM_COLS; c++)
+    {
+      if (!buttons[r][c].isClicked() && bombs.contains(buttons[r][c]))
+      {
+        buttons[r][c].marked = false;
+        buttons[r][c].clicked = true;
+        buttons[10][8].setLabel("L");
+        buttons[10][9].setLabel("o");
+        buttons[10][10].setLabel("s");
+        buttons[10][11].setLabel("e");
+        buttons[10][12].setLabel("r");
+        buttons[10][13].setLabel("!");
+      }
+    }
+  }
 }
 
 public void displayWinningMessage()
 {
   //your code here
-  //public String win = new String ("You Won!");
+  buttons[10][8].setLabel("Y");
+  buttons[10][9].setLabel("o");
+  buttons[10][10].setLabel("u");
+  buttons[10][11].setLabel("W");
+  buttons[10][12].setLabel("o");
+  buttons[10][13].setLabel("n");
 }
 
 public class MSButton
@@ -102,13 +128,27 @@ public class MSButton
     clicked = true;
     //your code here
     if (mouseButton == RIGHT)
-      marked = true;
-    else if (bombs.contains(this))
+    {
+      marked = !marked; 
+      if (marked == false)
+        clicked = false;
+    } else if (bombs.contains(this))
       displayLosingMessage();
-    else if (countBombs(r, c) >= 0)
+
+    else if (countBombs(r, c) > 0)
       label = "" + countBombs(r, c);
+
     else
-      buttons[r][c].mousePressed();
+    {
+      for (int i = r - 1; i <= r + 1; i++)
+      {
+        for (int j = c - 1; j <= c + 1; j++)
+        {
+          if (isValid(i, j) && !bombs.contains(buttons[i][j]) && buttons[i][j] != this && buttons[i][j].isClicked() == false) 
+            buttons[i][j].mousePressed();
+        }
+      }
+    }
   }
 
   public void draw () 
@@ -137,6 +177,7 @@ public class MSButton
     //your code here: check valid location
     if (r>=0 && r<20 && c>=0 && c<20)
       return true;
+
     return false;
   }
 
@@ -152,10 +193,6 @@ public class MSButton
           numBombs +=1;
       }
     }
-    
-    if (bombs.contains(buttons[r][c]))
-      numBombs -=1;
-
     return numBombs;
   }
 }
